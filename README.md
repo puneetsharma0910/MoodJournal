@@ -57,7 +57,7 @@ src/
 ├── utils/             # Utility functions
 ├── constants/         # Constants like mood options
 ├── App.jsx            # Root component
-├── index.jsx          # Entry point
+├── main.jsx          # Entry point
 └── index.css          # Tailwind & global styles
 ```
 
