@@ -1,145 +1,153 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Header from './components/Header';
-import Sidebar from './components/Sidebar';
+import Sidebar from './components/Sidebar.jsx';
 import MoodSelector from './components/MoodSelector';
 import WeatherDisplay from './components/WeatherDisplay';
 import NoteInput from './components/NoteInput';
 import CalendarView from './components/CalendarView';
 import MoodStats from './components/MoodStats';
-import { formatDateKey } from './utils/dateUtils';
-import useLocalStorage from './hooks/useLocalStorage';
+import { getCurrentDateString } from './utils/dateUtils';
 
 function App() {
-  const [darkMode, setDarkMode] = useLocalStorage('darkMode', false);
-  const [currentDate] = useState(new Date());
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [activeView, setActiveView] = useState('today');
-  const [entries, setEntries] = useLocalStorage('moodEntries', []);
-  const [selectedMood, setSelectedMood] = useState(null);
-  const [note, setNote] = useState('');
-  const [moodFilter, setMoodFilter] = useState('all');
+  const [darkMode, setDarkMode] = useState(false);
+  const [activeView, setActiveView] = useState('journal'); // 'journal', 'calendar', 'stats'
+  const [entries, setEntries] = useState([]);
+  const [currentEntry, setCurrentEntry] = useState({
+    date: getCurrentDateString(),
+    mood: null,
+    note: '',
+    weather: null
+  });
   
-  const todayKey = formatDateKey(currentDate);
-  
-  // Check for today's entry on initial render
+  // Load entries from localStorage on initial render
   useEffect(() => {
-    const todayEntry = entries.find(entry => entry.date === todayKey);
-    
-    if (todayEntry) {
-      setSelectedMood(todayEntry.mood);
-      setNote(todayEntry.note);
+    const savedEntries = localStorage.getItem('moodEntries');
+    if (savedEntries) {
+      setEntries(JSON.parse(savedEntries));
     }
-  }, [entries, todayKey]);
-  
-  // Apply dark mode to document
+  }, []);
+
+  // Save entries to localStorage whenever they change
   useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-  
-  // Save the current mood entry
-  const saveMoodEntry = (weather) => {
-    if (!selectedMood) {
-      alert("Please select a mood before saving.");
-      return;
-    }
+    localStorage.setItem('moodEntries', JSON.stringify(entries));
+  }, [entries]);
+
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  // Update current entry mood
+  const handleMoodSelect = (mood) => {
+    setCurrentEntry({
+      ...currentEntry,
+      mood
+    });
+  };
+
+  // Update current entry note
+  const handleNoteChange = (note) => {
+    setCurrentEntry({
+      ...currentEntry,
+      note
+    });
+  };
+
+  // Update weather data
+  const handleWeatherUpdate = (weatherData) => {
+    setCurrentEntry({
+      ...currentEntry,
+      weather: weatherData
+    });
+  };
+
+  // Save the current entry
+  const saveEntry = () => {
+    // Check if we already have an entry for today
+    const todayEntryIndex = entries.findIndex(entry => entry.date === currentEntry.date);
     
-    const newEntry = {
-      date: todayKey,
-      mood: selectedMood,
-      note: note,
-      weather: weather ? {
-        temp: weather.main.temp,
-        description: weather.weather[0].main,
-        icon: weather.weather[0].icon
-      } : null
-    };
-    
-    // Check if we're updating an existing entry
-    const existingEntryIndex = entries.findIndex(entry => entry.date === todayKey);
-    
-    if (existingEntryIndex >= 0) {
+    if (todayEntryIndex >= 0) {
       // Update existing entry
       const updatedEntries = [...entries];
-      updatedEntries[existingEntryIndex] = newEntry;
+      updatedEntries[todayEntryIndex] = currentEntry;
       setEntries(updatedEntries);
     } else {
       // Add new entry
-      setEntries([...entries, newEntry]);
+      setEntries([...entries, currentEntry]);
     }
     
-    // Show confirmation
-    alert("Your mood has been saved!");
+    // Show success notification (could be improved with a proper notification system)
+    alert('Entry saved successfully!');
   };
-  
-  // Get background color based on selected mood
-  const getBgColor = () => {
-    if (!selectedMood || activeView !== 'today') return 'bg-white dark:bg-gray-800';
-    return `${selectedMood.color} dark:bg-gray-800`;
+
+  // Export entries as CSV
+  const exportEntries = () => {
+    const csvContent = "data:text/csv;charset=utf-8," + 
+      "Date,Mood,Weather,Temperature,Note\n" + 
+      entries.map(entry => {
+        return `${entry.date},${entry.mood?.label || ''},${entry.weather?.weather[0]?.main || ''},${entry.weather?.main?.temp || ''},${entry.note}`;
+      }).join("\n");
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "mood-journal.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
-  
+
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${getBgColor()}`}>
-      {/* Mobile Menu Button */}
-      <div className="fixed top-4 right-4 md:hidden z-50">
-        <button 
-          onClick={() => setShowMobileMenu(!showMobileMenu)}
-          className="p-2 bg-white dark:bg-gray-700 rounded-full shadow-lg"
-        >
-          {showMobileMenu ? 'X' : '☰'}
-        </button>
-      </div>
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'}`}>
+      <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       
-      {/* Sidebar */}
-      <Sidebar 
-        showMobileMenu={showMobileMenu}
-        setShowMobileMenu={setShowMobileMenu}
-        activeView={activeView}
-        setActiveView={setActiveView}
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-        entries={entries}
-      />
-      
-      {/* Main Content */}
-      <div className="md:pl-64">
-        <div className="max-w-4xl mx-auto p-6">
-          <Header currentDate={currentDate} activeView={activeView} />
-          
-          {/* Today's Entry Section */}
-          {activeView === 'today' && (
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 animate-fadeIn">
-              {/* Weather Display */}
-              <WeatherDisplay saveMoodEntry={saveMoodEntry} />
+      <div className="flex flex-col md:flex-row">
+        <Sidebar 
+          activeView={activeView} 
+          setActiveView={setActiveView} 
+          darkMode={darkMode} 
+          exportEntries={exportEntries}
+        />
+        
+        <main className="flex-1 p-4">
+          {activeView === 'journal' && (
+            <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h2 className="text-2xl font-bold mb-4">Today's Entry</h2>
+              <p className="text-lg mb-4">{currentEntry.date}</p>
               
-              {/* Mood Selection */}
-              <MoodSelector 
-                selectedMood={selectedMood} 
-                setSelectedMood={setSelectedMood} 
-              />
+              <WeatherDisplay onWeatherUpdate={handleWeatherUpdate} />
               
-              {/* Note Input */}
-              <NoteInput note={note} setNote={setNote} />
+              <div className="my-6">
+                <h3 className="text-lg font-medium mb-2">How are you feeling today?</h3>
+                <MoodSelector selectedMood={currentEntry.mood} onMoodSelect={handleMoodSelect} />
+              </div>
+              
+              <div className="my-6">
+                <NoteInput value={currentEntry.note} onChange={handleNoteChange} />
+              </div>
+              
+              <button 
+                onClick={saveEntry}
+                disabled={!currentEntry.mood}
+                className={`px-4 py-2 rounded-lg ${
+                  currentEntry.mood 
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white' 
+                    : 'bg-gray-300 cursor-not-allowed text-gray-500'
+                }`}
+              >
+                Save Entry
+              </button>
             </div>
           )}
           
-          {/* Calendar View */}
           {activeView === 'calendar' && (
-            <CalendarView 
-              entries={entries} 
-              moodFilter={moodFilter}
-              setMoodFilter={setMoodFilter}
-            />
+            <CalendarView entries={entries} />
           )}
           
-          {/* Stats View */}
           {activeView === 'stats' && (
             <MoodStats entries={entries} />
           )}
-        </div>
+        </main>
       </div>
     </div>
   );

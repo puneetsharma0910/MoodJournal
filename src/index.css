@@ -11,25 +11,29 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.5s ease-in;
+/* Animation for mood selection */
+.mood-option {
+  transition: transform 0.2s ease-in-out;
 }
 
-.animate-slideIn {
-  animation: slideIn 0.3s ease-out;
+.mood-option:hover {
+  transform: scale(1.1);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.mood-option.selected {
+  transform: scale(1.15);
 }
 
-@keyframes slideIn {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+/* Calendar styling */
+.calendar-day {
+  transition: all 0.2s ease;
 }
 
-/* Remove scrollbar for better aesthetics */
+.calendar-day:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -49,20 +53,13 @@ body {
 
 /* Dark mode scrollbar */
 .dark ::-webkit-scrollbar-track {
-  background: #2d3748;
+  background: #374151;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #4a5568;
+  background: #6B7280;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #718096;
-}
-
-/* Transition effects */
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
+  background: #9CA3AF;
 }

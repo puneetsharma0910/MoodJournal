@@ -1,78 +1,51 @@
 /**
- * Export entries as CSV file
- * @param {Array} entries - Array of mood entries
+ * Export mood journal entries as a CSV file
+ * @param {Array} entries - Array of journal entries
  */
 export const exportAsCSV = (entries) => {
-    if (entries.length === 0) {
-      alert('No entries to export');
-      return;
-    }
+    // Header row
+    const csvRows = [
+      ['Date', 'Mood', 'Weather', 'Temperature', 'Note'].join(',')
+    ];
+    
+    // Data rows
+    entries.forEach(entry => {
+      const row = [
+        entry.date,
+        entry.mood?.label || '',
+        entry.weather?.weather[0]?.main || '',
+        entry.weather?.main?.temp ? `${Math.round(entry.weather.main.temp)}°C` : '',
+        // Escape quotes in notes to avoid CSV parsing issues
+        `"${entry.note?.replace(/"/g, '""') || ''}"`
+      ];
+      
+      csvRows.push(row.join(','));
+    });
     
     // Create CSV content
-    let csvContent = "Date,Mood,Weather,Temperature,Note\n";
+    const csvContent = csvRows.join('\n');
     
-    entries.forEach(entry => {
-      const weatherDesc = entry.weather ? entry.weather.description : "N/A";
-      const temp = entry.weather ? `${entry.weather.temp}°C` : "N/A";
-      // Handle quotes in notes (escape by doubling them)
-      const safeNote = entry.note ? `"${entry.note.replace(/"/g, '""')}"` : "";
-      
-      csvContent += `${entry.date},${entry.mood.name},${weatherDesc},${temp},${safeNote}\n`;
-    });
-    
-    // Create and download file
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'mood-journal-export.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `mood-journal-export-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    // Add to DOM, trigger download, and clean up
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
   
   /**
-   * Group entries by mood
-   * @param {Array} entries - Array of mood entries
-   * @returns {Object} Grouped entries by mood
+   * Export mood journal entries as a PDF file
+   * @param {Array} entries - Array of journal entries
    */
-  export const groupEntriesByMood = (entries) => {
-    const grouped = {};
+  export const exportAsPDF = (entries) => {
+    // This is a placeholder for PDF export functionality
+    // In a real implementation, you would use a library like jsPDF
     
-    entries.forEach(entry => {
-      const mood = entry.mood.name;
-      if (!grouped[mood]) {
-        grouped[mood] = [];
-      }
-      grouped[mood].push(entry);
-    });
-    
-    return grouped;
-  };
-  
-  /**
-   * Calculate mood frequency percentages
-   * @param {Array} entries - Array of mood entries
-   * @returns {Array} Array of mood frequencies with percentages
-   */
-  export const calculateMoodPercentages = (entries) => {
-    if (entries.length === 0) return [];
-    
-    const grouped = groupEntriesByMood(entries);
-    const results = [];
-    
-    Object.keys(grouped).forEach(mood => {
-      const count = grouped[mood].length;
-      const percentage = Math.round((count / entries.length) * 100);
-      
-      results.push({
-        mood,
-        count,
-        percentage
-      });
-    });
-    
-    // Sort by count (descending)
-    return results.sort((a, b) => b.count - a.count);
+    alert('PDF export functionality not implemented yet.');
   };
