@@ -19,7 +19,7 @@ function App() {
     weather: null
   });
   
-  // Load entries from localStorage on initial render
+ 
   useEffect(() => {
     const savedEntries = localStorage.getItem('moodEntries');
     if (savedEntries) {
@@ -27,17 +27,17 @@ function App() {
     }
   }, []);
 
-  // Save entries to localStorage whenever they change
+  
   useEffect(() => {
     localStorage.setItem('moodEntries', JSON.stringify(entries));
   }, [entries]);
 
-  // Toggle dark mode
+  //  dark mode
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
 
-  // Update current entry mood
+  //  current entry mood
   const handleMoodSelect = (mood) => {
     setCurrentEntry({
       ...currentEntry,
@@ -45,7 +45,7 @@ function App() {
     });
   };
 
-  // Update current entry note
+  //  current entry note
   const handleNoteChange = (note) => {
     setCurrentEntry({
       ...currentEntry,
@@ -53,7 +53,7 @@ function App() {
     });
   };
 
-  // Update weather data
+  //
   const handleWeatherUpdate = (weatherData) => {
     setCurrentEntry({
       ...currentEntry,
@@ -61,26 +61,25 @@ function App() {
     });
   };
 
-  // Save the current entry
   const saveEntry = () => {
-    // Check if we already have an entry for today
+
     const todayEntryIndex = entries.findIndex(entry => entry.date === currentEntry.date);
     
     if (todayEntryIndex >= 0) {
-      // Update existing entry
+      
       const updatedEntries = [...entries];
       updatedEntries[todayEntryIndex] = currentEntry;
       setEntries(updatedEntries);
     } else {
-      // Add new entry
+    
       setEntries([...entries, currentEntry]);
     }
     
-    // Show success notification (could be improved with a proper notification system)
+    
     alert('Entry saved successfully!');
   };
 
-  // Export entries as CSV
+
   const exportEntries = () => {
     const csvContent = "data:text/csv;charset=utf-8," + 
       "Date,Mood,Weather,Temperature,Note\n" + 

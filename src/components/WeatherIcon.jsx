@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Simple component to display weather icons based on condition
 const WeatherIcon = ({ condition }) => {
   const getIcon = () => {
     switch (condition?.toLowerCase()) {

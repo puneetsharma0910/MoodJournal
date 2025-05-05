@@ -1,13 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-/**
- * Custom hook for using localStorage with React state
- * @param {string} key - The localStorage key
- * @param {any} initialValue - Initial value if key doesn't exist in localStorage
- * @returns {Array} [storedValue, setValue] - State value and setter function
- */
 const useLocalStorage = (key, initialValue) => {
-  // Get initial value from localStorage or use provided initialValue
   const [storedValue, setStoredValue] = useState(() => {
     try {
       const item = window.localStorage.getItem(key);
@@ -18,7 +11,6 @@ const useLocalStorage = (key, initialValue) => {
     }
   });
 
-  // Update localStorage when state changes
   useEffect(() => {
     try {
       window.localStorage.setItem(key, JSON.stringify(storedValue));

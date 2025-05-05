@@ -8,13 +8,12 @@ const CalendarView = ({ entries }) => {
   const [filteredEntries, setFilteredEntries] = useState([]);
   const [moodFilter, setMoodFilter] = useState('all');
 
-  // Get all unique mood types from entries
+
   const moodTypes = ['all', ...new Set(entries.map(entry => entry.mood?.label).filter(Boolean))];
 
   useEffect(() => {
     generateCalendarDays();
-    
-    // Filter entries based on selected mood
+
     if (moodFilter === 'all') {
       setFilteredEntries(entries);
     } else {
@@ -26,23 +25,22 @@ const CalendarView = ({ entries }) => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     
-    // Get the first day of the month
+
     const firstDayOfMonth = new Date(year, month, 1);
     const startingDayOfWeek = firstDayOfMonth.getDay();
     
-    // Get the last day of the month
+    
     const lastDayOfMonth = new Date(year, month + 1, 0);
     const totalDays = lastDayOfMonth.getDate();
     
-    // Generate array of days
+ 
     const days = [];
     
-    // Add empty days for the start of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
       days.push({ day: null, date: null });
     }
     
-    // Add actual days
+    //s
     for (let i = 1; i <= totalDays; i++) {
       const date = new Date(year, month, i);
       const dateString = date.toISOString().split('T')[0];

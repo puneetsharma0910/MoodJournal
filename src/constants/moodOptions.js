@@ -1,4 +1,4 @@
-// Define mood options with IDs, labels, emojis, and background colors
+
 export const moodOptions = [
   {
     id: 'awful',
