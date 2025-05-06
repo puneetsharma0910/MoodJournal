@@ -97,10 +97,10 @@ function App() {
   };
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'}`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'}`}>
       <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       
-      <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row min-h-[calc(100vh-64px)]">
         <Sidebar 
           activeView={activeView} 
           setActiveView={setActiveView} 
@@ -108,34 +108,43 @@ function App() {
           exportEntries={exportEntries}
         />
         
-        <main className="flex-1 p-4">
+        <main className="flex-1 p-6 md:p-8">
           {activeView === 'journal' && (
-            <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h2 className="text-2xl font-bold mb-4">Today's Entry</h2>
-              <p className="text-lg mb-4">{currentEntry.date}</p>
-              
-              <WeatherDisplay onWeatherUpdate={handleWeatherUpdate} />
-              
-              <div className="my-6">
-                <h3 className="text-lg font-medium mb-2">How are you feeling today?</h3>
-                <MoodSelector selectedMood={currentEntry.mood} onMoodSelect={handleMoodSelect} />
+            <div className="max-w-3xl mx-auto">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 md:p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Today's Entry</h2>
+                    <p className="text-gray-600 dark:text-gray-300 mt-1">{currentEntry.date}</p>
+                  </div>
+                  <WeatherDisplay onWeatherUpdate={handleWeatherUpdate} />
+                </div>
+                
+                <div className="space-y-8">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">How are you feeling today?</h3>
+                    <MoodSelector selectedMood={currentEntry.mood} onMoodSelect={handleMoodSelect} />
+                  </div>
+                  
+                  <div>
+                    <NoteInput value={currentEntry.note} onChange={handleNoteChange} />
+                  </div>
+                  
+                  <div className="flex justify-end">
+                    <button 
+                      onClick={saveEntry}
+                      disabled={!currentEntry.mood}
+                      className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+                        currentEntry.mood 
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5' 
+                          : 'bg-gray-300 cursor-not-allowed text-gray-500'
+                      }`}
+                    >
+                      Save Entry
+                    </button>
+                  </div>
+                </div>
               </div>
-              
-              <div className="my-6">
-                <NoteInput value={currentEntry.note} onChange={handleNoteChange} />
-              </div>
-              
-              <button 
-                onClick={saveEntry}
-                disabled={!currentEntry.mood}
-                className={`px-4 py-2 rounded-lg ${
-                  currentEntry.mood 
-                    ? 'bg-blue-500 hover:bg-blue-600 text-white' 
-                    : 'bg-gray-300 cursor-not-allowed text-gray-500'
-                }`}
-              >
-                Save Entry
-              </button>
             </div>
           )}
           

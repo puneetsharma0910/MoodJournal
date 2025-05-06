@@ -14,7 +14,6 @@ const WeatherDisplay = ({ onWeatherUpdate }) => {
       return;
     }
 
-    // Fetch user's location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         position => {
@@ -76,23 +75,30 @@ const WeatherDisplay = ({ onWeatherUpdate }) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+      <div className="flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-700 rounded-xl shadow-sm">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-        <span className="ml-2">Loading weather data...</span>
+        <span className="ml-3 text-gray-600 dark:text-gray-300">Loading weather...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-100 rounded-lg">
-        <p>{error}</p>
-        <button 
-          onClick={retryFetch}
-          className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
-        >
-          Retry
-        </button>
+      <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-300 rounded-xl shadow-sm">
+        <div className="flex items-start">
+          <svg className="w-5 h-5 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="font-medium">{error}</p>
+            <button 
+              onClick={retryFetch}
+              className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200 text-sm font-medium"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -102,12 +108,12 @@ const WeatherDisplay = ({ onWeatherUpdate }) => {
   const { main, weather: weatherConditions, name } = weather;
 
   return (
-    <div className="flex items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+    <div className="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-xl shadow-sm">
       <WeatherIcon condition={weatherConditions[0].main} />
       <div className="ml-4">
-        <p className="font-medium">{name}</p>
-        <div className="flex items-center">
-          <p className="text-2xl font-bold">{Math.round(main.temp)}°C</p>
+        <p className="font-medium text-gray-800 dark:text-white">{name}</p>
+        <div className="flex items-baseline">
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{Math.round(main.temp)}°C</p>
           <p className="ml-2 text-gray-600 dark:text-gray-300">{weatherConditions[0].main}</p>
         </div>
         <p className="text-sm text-gray-500 dark:text-gray-400">
